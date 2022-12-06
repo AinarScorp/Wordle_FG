@@ -79,6 +79,8 @@ public class GoalWord
 
     }
     public Letter[] Letters => letters;
+
+    public string TheWord => theWord;
 }
 
 [Serializable]

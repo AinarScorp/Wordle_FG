@@ -16,8 +16,10 @@ public class KeyboardInputController : MonoBehaviour
     {
         if (gameManager == null)
         {
-            gameManager = FindObjectOfType<GameManager>();
+            gameManager = GameObject.FindWithTag("GameManager").GetComponent<GameManager>();
         }
+        gameManager.GameIsOver += gameIsWon => Destroy(this);
+
         
     }
 
@@ -58,7 +60,7 @@ public class KeyboardInputController : MonoBehaviour
             erasingLetters = StartCoroutine(EraseLetters());
         }
 
-        if (Input.GetKeyUp(deleteLetterKey))
+        if (Input.GetKeyUp(deleteLetterKey) && erasingLetters!=null)
         {
             StopCoroutine(erasingLetters);
         }
@@ -69,7 +71,7 @@ public class KeyboardInputController : MonoBehaviour
         WaitForSeconds wait = new WaitForSeconds(erasingPace);
         while (true)
         {
-            gameManager.RemoveLetterAt(removeAt);
+            gameManager.RemoveLetter();
             yield return wait;
         }
     }
