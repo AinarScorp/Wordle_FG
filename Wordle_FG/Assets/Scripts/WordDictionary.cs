@@ -6,36 +6,43 @@ using Random = UnityEngine.Random;
 public class WordDictionary : MonoBehaviour
 {
     const int LETTER_COUNT = 5;
+    readonly HashSet<string> completeWordList = new HashSet<string>(); // use for checking contains
     
     [SerializeField] TextAsset completeListOfWords;
     [SerializeField] TextAsset easyListOfWords; //Not used for now
     
-    string[] allWords; // use for searching by index
-    HashSet<string> wordList = new HashSet<string>(); // use for checking contains
+    string[] allWordsCompleteList; // use for searching by index
+    string[] allWordsEasyList; // use for searching by index
 
-    public int WordsCount => allWords.Length;
+    public int WordsCountCompleteList => allWordsCompleteList.Length;
+    public int WordsCountEasyList => allWordsEasyList.Length;
     void Awake()
     {
-        CreateWordList();
+        CreateWordLists();
     }
     
-    void CreateWordList()
+    void CreateWordLists()
     {
-        string fullText = completeListOfWords.text;
-        string[] allLines = fullText.Split("\r\n");
+        string fullTextFromComplete = completeListOfWords.text;
+        string[] allLinesFromComplete = fullTextFromComplete.Split("\r\n");
 
-        allWords = allLines;
-        wordList.UnionWith(allLines);
+        allWordsCompleteList = allLinesFromComplete;
+        completeWordList.UnionWith(allLinesFromComplete);
+        
+        string fullTextFromEasy = easyListOfWords.text;
+        string[] allLinesFromEasy = fullTextFromEasy.Split("\r\n");
+        allWordsEasyList = allLinesFromEasy;
     }
 
-    public string GetWordAtIndex(int index)
+    public string GetWordAtIndex(int index, bool takeFromEasyList = true)
     {
-        if (index<0 || index>= allWords.Length)
+        string[] listToTakeFrom = takeFromEasyList ? allWordsEasyList : allWordsCompleteList;
+        if (index<0 || index>= listToTakeFrom.Length)
         {
             Debug.LogError("The index is out of the array of Words");
             return "";
         }
-        return allWords[index];
+        return listToTakeFrom[index];
     }
     public bool WordExists(string word)
     {
@@ -43,7 +50,7 @@ public class WordDictionary : MonoBehaviour
         {
             return false;
         }
-        return wordList.Contains(word);
+        return completeWordList.Contains(word);
     }
 }
 

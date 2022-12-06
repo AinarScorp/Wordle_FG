@@ -6,10 +6,12 @@ using Random = UnityEngine.Random;
 
 public class GameManager : MonoBehaviour
 {
+    [SerializeField] GoalWord goalWord;
+    [SerializeField] bool easyMode = true;
+    
     [SerializeField] WordDictionary wordDictionary;
     [SerializeField] GridManager gridManager;
 
-    [SerializeField] GoalWord goalWord;
     int currentRow;
     int currentLetter;
 
@@ -167,8 +169,14 @@ public class GameManager : MonoBehaviour
     [ContextMenu("Get random Word")]
     void GetRandomWord()
     {
-        int randomNumber = Random.Range(0, wordDictionary.WordsCount);
-        string randomWord = wordDictionary.GetWordAtIndex(randomNumber);
+        int wordCount = easyMode ? wordDictionary.WordsCountEasyList : wordDictionary.WordsCountCompleteList;
+        int randomNumber = Random.Range(0, wordCount);
+        string randomWord = wordDictionary.GetWordAtIndex(randomNumber,easyMode);
         goalWord = new GoalWord(randomWord);
+    }
+
+    public void SetDifficulty(bool isEasy)
+    {
+        easyMode = isEasy;
     }
 }
