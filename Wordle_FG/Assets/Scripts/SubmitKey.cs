@@ -13,38 +13,33 @@ public class SubmitKey : MonoBehaviour
     [SerializeField] Color noSuchWordColor = Color.red;
     [SerializeField] Color readyToSubmitColor = Color.blue;
     [SerializeField] Color notReadyToSubmitColor = Color.gray;
-    [SerializeField] string noSuchWordText= "Not a \nword";
+    [SerializeField][TextArea] string noSuchWordText= "Not a \nword";
     [SerializeField] string submitText = "Submit";
     
-    [SerializeField] TextMeshPro displayText;
+    [SerializeField]KeyboardKeyVisuals keyboardKeyVisuals;
+    
     SubmitState submitState = SubmitState.notReady;
     GameManager gameManager;
 
-    MeshRenderer meshRenderer;
-    Material material;
-
+    
+    
     void Awake()
     {
-        if (displayText == null)
-        {
-            displayText = GetComponentInChildren<TextMeshPro>();
-        }
+        keyboardKeyVisuals = GetComponent<KeyboardKeyVisuals>();
         gameManager = GameObject.FindWithTag("GameManager").GetComponent<GameManager>();
 
-        AssignMaterial();
     }
 
-    void AssignMaterial()
-    {
-        meshRenderer = GetComponentInChildren<MeshRenderer>();
-        material = meshRenderer.material;
-        meshRenderer.material = material;
-    }
+
 
     void Start()
     {
         gameManager.LetterRemoved += (row, pos) => ResetState();
-        gameManager.WordGuessed+= row => ResetState();
+        gameManager.WordGuessed+= row =>
+        {
+            keyboardKeyVisuals.PlayPressEffect();
+            ResetState();
+        };
         
         gameManager.LetterAdded += (row, pos, letter) => ChangeColorCorrect(pos); 
 
@@ -55,30 +50,36 @@ public class SubmitKey : MonoBehaviour
 
     void ResetState()
     {
+        if (submitState ==SubmitState.notReady )
+        {
+            return;
+        }
         submitState = SubmitState.notReady;
         UpdateColor();
     }
     void UpdateColor()
     {
+        Color newColor = Color.white;
         switch (submitState)
         {
             case SubmitState.Ready:
-                material.color = readyToSubmitColor;
+                newColor = readyToSubmitColor;
                 break;
             case SubmitState.notReady:
-                material.color = notReadyToSubmitColor;
+                newColor = notReadyToSubmitColor;
                 break;
             case SubmitState.noSuchWord:
-                material.color = noSuchWordColor;
+                newColor = noSuchWordColor;
                 break;
         }
-        UpdateText();
+        keyboardKeyVisuals.PlayUpdateColor(newColor, UpdateText);
     }
 
     void UpdateText()
     {
         bool submitStateIsRed = submitState == SubmitState.noSuchWord;
-        displayText.text = submitStateIsRed ? noSuchWordText : submitText;
+        string newText = submitStateIsRed ? noSuchWordText : submitText;
+        keyboardKeyVisuals.UpdateText(newText);
     }
 
     void ChangeColorCorrect(int pos)
@@ -94,12 +95,27 @@ public class SubmitKey : MonoBehaviour
 
     void OnMouseDown()
     {
-        if (submitState != SubmitState.Ready)
-        {
-            return;
-        }
+        if (!ButtonReady()) return;
+
         gameManager.GuessWord();
     }
-    
+    void OnMouseEnter()
+    {
+        if (!ButtonReady()) return;
+
+        keyboardKeyVisuals.PlayOnHoverEnter();
+    }
+
+    void OnMouseExit()
+    {
+        if (!ButtonReady()) return;
+        
+        keyboardKeyVisuals.PlayOnHoverExit();
+    }
+
+    bool ButtonReady()
+    {
+        return submitState == SubmitState.Ready;
+    }
 }
 

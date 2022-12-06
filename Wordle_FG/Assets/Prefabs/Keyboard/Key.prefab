@@ -192,8 +192,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
-  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+    rgba: 4278190080
+  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -264,8 +264,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6322736175846129560}
-  - component: {fileID: 6322736175846129562}
   - component: {fileID: 6322736175846129561}
+  - component: {fileID: 6322736175846129562}
+  - component: {fileID: 2795553255250154852}
   m_Layer: 0
   m_Name: Key
   m_TagString: Untagged
@@ -290,21 +291,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &6322736175846129562
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6322736175846129557}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 674a25946c84efe4bb1c3a8923ba9d7b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  colorFromState: {fileID: 11400000, guid: 7c9a0a55cbab80b4c9b7b35b62ed6d21, type: 2}
-  letterDisplay: {fileID: 6322736175208250244}
-  thisLetter: 113
 --- !u!65 &6322736175846129561
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -318,3 +304,35 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1.5, y: 2, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &6322736175846129562
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6322736175846129557}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 674a25946c84efe4bb1c3a8923ba9d7b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  colorFromState: {fileID: 11400000, guid: 7c9a0a55cbab80b4c9b7b35b62ed6d21, type: 2}
+  keyboardKeyVisuals: {fileID: 2795553255250154852}
+  thisLetter: 113
+--- !u!114 &2795553255250154852
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6322736175846129557}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df1eae50bccd2dd4d829460145534b9f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  letterDisplay: {fileID: 6322736175208250244}
+  pressedEffectSpeed: 10
+  pressedEffectEndScale: 0.9
+  hoverEffectEndScale: 1.15
+  dissolvingSpeed: 1

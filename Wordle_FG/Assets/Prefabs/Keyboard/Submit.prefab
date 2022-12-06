@@ -266,6 +266,7 @@ GameObject:
   - component: {fileID: 5239239169990986201}
   - component: {fileID: 7813549333850995345}
   - component: {fileID: 175668239}
+  - component: {fileID: 2000397895958010488}
   m_Layer: 0
   m_Name: Submit
   m_TagString: Untagged
@@ -320,4 +321,21 @@ MonoBehaviour:
   notReadyToSubmitColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   noSuchWordText: "Not a \nword"
   submitText: Submit
-  displayText: {fileID: 1185096810220238427}
+  keyboardKeyVisuals: {fileID: 2000397895958010488}
+--- !u!114 &2000397895958010488
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5239239169990986205}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df1eae50bccd2dd4d829460145534b9f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  letterDisplay: {fileID: 1185096810220238427}
+  pressedEffectSpeed: 3
+  pressedEffectEndScale: 0.9
+  hoverEffectEndScale: 1.15
+  dissolvingSpeed: 5

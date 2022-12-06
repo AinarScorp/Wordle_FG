@@ -6,12 +6,12 @@ using UnityEngine;
 public class LetterBlock : MonoBehaviour
 {
     [SerializeField] float rotationSpeed = 5.0f;
-    [SerializeField] char chosenLetter;
 
     [SerializeField] TextMeshPro displayLetter;
 
     [SerializeField] MeshRenderer meshRenderer;
     Material material;
+    char chosenLetter;
     int thisRow, letterPosition;
     Coroutine spinningCoroutine;
 
@@ -23,6 +23,10 @@ public class LetterBlock : MonoBehaviour
     void Awake()
     {
         AssignMaterial();
+        if (displayLetter == null)
+        {
+            displayLetter = GetComponentInChildren<TextMeshPro>();
+        }
     }
 
     void AssignMaterial()
@@ -46,7 +50,9 @@ public class LetterBlock : MonoBehaviour
     }
     void UpdateColor()
     {
-        material.color = updatedColor;
+        //material.color = updatedColor;
+        material.SetColor("_BaseColor", updatedColor);
+
     }
     public void UpdateLetter(char newLetter)
     {
@@ -56,24 +62,28 @@ public class LetterBlock : MonoBehaviour
 
     void UpdateLetterOrientation()
     {
-        if (displayLetter == null)
-        {
-            Debug.LogError("Attach Text letter");
-            return;
-        }
         float dotProduct = Vector3.Dot(transform.forward, Vector3.forward);
         Vector3 localScale = displayLetter.transform.localScale;
         float startingSign =Mathf.Sign(localScale.y);
         float sign = Mathf.Sign(dotProduct);
         localScale.y = sign;
-        
+
+        PerformDissolveEffect(sign, dotProduct);
         displayLetter.transform.localScale = localScale;
-        
+
         //Update sign when flipped
         if ((int)startingSign !=(int)sign)
         {
             UpdateColor();
         }
+    }
+
+    void PerformDissolveEffect(float sign, float dotProduct)
+    {
+        float maxPercent = 0.5f;
+        float minPercent = -1.5f;
+        float percentSlider = sign > 0 ? Mathf.Lerp(minPercent, maxPercent, 1 - dotProduct) : Mathf.Lerp(maxPercent, minPercent, -dotProduct);
+        material.SetFloat("_Percent", percentSlider);
     }
 
     [ContextMenu("Spin")]
@@ -96,6 +106,7 @@ public class LetterBlock : MonoBehaviour
         {
             transform.rotation = Quaternion.Lerp(startRotation, endRotation, percent);
             percent += rotationSpeed * Time.deltaTime;
+
             UpdateLetterOrientation();
             yield return new WaitForEndOfFrame();
         }

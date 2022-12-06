@@ -11,6 +11,7 @@ public class KeyboardInputController : MonoBehaviour
     [SerializeField] [Range(0, 4)] int removeAt;
     [SerializeField] KeyCode guessWordKey = KeyCode.Return;
     [SerializeField] float erasingPace = 2;
+
     Coroutine erasingLetters;
     void Awake()
     {

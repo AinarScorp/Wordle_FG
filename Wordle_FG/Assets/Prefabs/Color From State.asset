@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: Color From State
   m_EditorClassIdentifier: 
   wrongLetter: {r: 0.5, g: 0.5, b: 0.5, a: 1}
-  wrongPos: {r: 0.8490566, g: 0.79233736, b: 0.14951934, a: 1}
+  wrongPos: {r: 0.8396226, g: 0.7842906, b: 0.20330477, a: 1}
   correctLetter: {r: 0.012311538, g: 0.7830189, b: 0.012311538, a: 1}
   notTestedLetter: {r: 1, g: 1, b: 1, a: 1}

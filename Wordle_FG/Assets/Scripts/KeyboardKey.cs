@@ -1,27 +1,37 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
-
 public class KeyboardKey : MonoBehaviour
 {
     [SerializeField] ColorFromState colorFromState;
 
-    [SerializeField] TextMeshPro letterDisplay;
+    [SerializeField]KeyboardKeyVisuals keyboardKeyVisuals;
     [SerializeField,HideInInspector] char thisLetter;
+
+    
     LetterState currentLetterState = LetterState.NotTested;
 
     GameManager gameManager;
-    MeshRenderer meshRenderer;
-    Material material;
 
     void Awake()
+    {
+        SubscribeToGameManager();
+    }
+
+    void SubscribeToGameManager()
     {
         gameManager = GameObject.FindWithTag("GameManager").GetComponent<GameManager>();
         gameManager.LetterChecked += UpdateLetterState;
         gameManager.GameIsOver += gameIsWon => Destroy(this);
+        gameManager.LetterAdded += (row, pos1, pressedLetter) =>
+        {
+            if (Char.ToUpper(pressedLetter) == Char.ToUpper(thisLetter))
+            {
+                keyboardKeyVisuals.PlayPressEffect();
+            }
+        };
     }
+
+
 
     void UpdateLetterState(LetterBlock letterBlock, LetterState letterState)
     {
@@ -36,30 +46,28 @@ public class KeyboardKey : MonoBehaviour
         }
 
         currentLetterState = letterState;
-        UpdateColor();
+        Color newColor = colorFromState.GetColorFromState(currentLetterState);
+        keyboardKeyVisuals.PlayUpdateColor(newColor, ()=> keyboardKeyVisuals.UpdateText(Color.white));
     }
-    void UpdateColor()
-    {
-        if (meshRenderer == null)
-        {
-            meshRenderer = GetComponentInChildren<MeshRenderer>();
-        }
 
-        if (material == null)
-        {
-            material = meshRenderer.material;
-        }
-        material.color = colorFromState.GetColorFromState(currentLetterState);
-        meshRenderer.material =material;
-    }
 
     public void AssignLetter(char newChar)
     {
         thisLetter = Char.ToUpper(newChar);
-        letterDisplay.text = thisLetter.ToString();
+        keyboardKeyVisuals.UpdateText(Color.black,thisLetter.ToString());
     }
     void OnMouseDown()
     {
         gameManager.AddLetter(thisLetter);
+    }
+
+    void OnMouseEnter()
+    {
+        keyboardKeyVisuals.PlayOnHoverEnter();
+    }
+
+    void OnMouseExit()
+    {
+        keyboardKeyVisuals.PlayOnHoverExit();
     }
 }
