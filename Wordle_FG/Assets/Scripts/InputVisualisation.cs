@@ -18,7 +18,7 @@ public class InputVisualisation : MonoBehaviour
         {
             gridManager = FindObjectOfType<GridManager>();
         }
-        GameManager gameManager = FindObjectOfType<GameManager>();
+        GameManager gameManager = GameObject.FindWithTag("GameManager").GetComponent<GameManager>();
         gameManager.LetterAdded += AddLetter;
         gameManager.LetterRemoved += RemoveLetter;
     }
@@ -27,12 +27,15 @@ public class InputVisualisation : MonoBehaviour
     void AddLetter(int rowIndex,int letterPosition,Char letter)
     {
         LetterBlock letterBlock = gridManager.RowOfLetters[rowIndex][letterPosition];
+        letterBlock.PlayPressEffect();
         UpdateLetterDisplay(letterBlock,letter);
     }
 
     void RemoveLetter(int rowIndex,int letterPosition)
     {
         LetterBlock letterBlock = gridManager.RowOfLetters[rowIndex][letterPosition];
+        letterBlock.PlayPressEffect();
+
         UpdateLetterDisplay(letterBlock,EMPTY_LETTER);
 
     }

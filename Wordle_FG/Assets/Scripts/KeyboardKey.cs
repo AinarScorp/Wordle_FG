@@ -4,9 +4,10 @@ public class KeyboardKey : MonoBehaviour
 {
     [SerializeField] ColorFromState colorFromState;
 
-    [SerializeField]KeyboardKeyVisuals keyboardKeyVisuals;
+    [SerializeField]GameVisuals gameVisuals;
     [SerializeField,HideInInspector] char thisLetter;
 
+    bool gameHasStarted;
     
     LetterState currentLetterState = LetterState.NotTested;
 
@@ -26,9 +27,10 @@ public class KeyboardKey : MonoBehaviour
         {
             if (Char.ToUpper(pressedLetter) == Char.ToUpper(thisLetter))
             {
-                keyboardKeyVisuals.PlayPressEffect();
+                gameVisuals.PlayPressEffect();
             }
         };
+        gameManager.GameHasStarted += () => gameHasStarted = true;
     }
 
 
@@ -47,27 +49,36 @@ public class KeyboardKey : MonoBehaviour
 
         currentLetterState = letterState;
         Color newColor = colorFromState.GetColorFromState(currentLetterState);
-        keyboardKeyVisuals.PlayUpdateColor(newColor, ()=> keyboardKeyVisuals.UpdateText(Color.white));
+        gameVisuals.PlayUpdateColor(newColor, ()=> gameVisuals.UpdateText(Color.white));
     }
 
 
     public void AssignLetter(char newChar)
     {
         thisLetter = Char.ToUpper(newChar);
-        keyboardKeyVisuals.UpdateText(Color.black,thisLetter.ToString());
+        gameVisuals.UpdateText(Color.black,thisLetter.ToString());
     }
     void OnMouseDown()
     {
-        gameManager.AddLetter(thisLetter);
+        if (gameHasStarted)
+        {
+            gameManager.AddLetter(thisLetter);
+        }
     }
 
     void OnMouseEnter()
     {
-        keyboardKeyVisuals.PlayOnHoverEnter();
+        if (gameHasStarted)
+        {
+            gameVisuals.PlayIncreaseScale();
+        }
     }
 
     void OnMouseExit()
     {
-        keyboardKeyVisuals.PlayOnHoverExit();
+        if (gameHasStarted)
+        {
+            gameVisuals.PlayDescreaseScale();
+        }
     }
 }

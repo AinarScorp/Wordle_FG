@@ -10,13 +10,17 @@ public class SubmitKey : MonoBehaviour
     {
         Ready, notReady, noSuchWord
     }
+    [Header("Colors")]
     [SerializeField] Color noSuchWordColor = Color.red;
     [SerializeField] Color readyToSubmitColor = Color.blue;
     [SerializeField] Color notReadyToSubmitColor = Color.gray;
+    [Header("Texts")]
     [SerializeField][TextArea] string noSuchWordText= "Not a \nword";
     [SerializeField] string submitText = "Submit";
+
+    bool gameHasStarted;
     
-    [SerializeField]KeyboardKeyVisuals keyboardKeyVisuals;
+    GameVisuals gameVisuals;
     
     SubmitState submitState = SubmitState.notReady;
     GameManager gameManager;
@@ -25,28 +29,33 @@ public class SubmitKey : MonoBehaviour
     
     void Awake()
     {
-        keyboardKeyVisuals = GetComponent<KeyboardKeyVisuals>();
+        gameVisuals = GetComponent<GameVisuals>();
         gameManager = GameObject.FindWithTag("GameManager").GetComponent<GameManager>();
-
     }
 
 
 
     void Start()
     {
+        SubscribeToEvents();
+        UpdateText();
+    }
+
+    void SubscribeToEvents()
+    {
         gameManager.LetterRemoved += (row, pos) => ResetState();
-        gameManager.WordGuessed+= row =>
+        gameManager.WordGuessed += row =>
         {
-            keyboardKeyVisuals.PlayPressEffect();
+            gameVisuals.PlayPressEffect();
             ResetState();
         };
-        
-        gameManager.LetterAdded += (row, pos, letter) => ChangeColorCorrect(pos); 
-
+        gameManager.LetterAdded += (row, pos, letter) => ChangeColorCorrect(pos);
         gameManager.GameIsOver += gameIsWon => Destroy(this);
-
-        ResetState();
+        gameManager.GameHasStarted += () => gameHasStarted = true;
     }
+
+
+
 
     void ResetState()
     {
@@ -72,14 +81,14 @@ public class SubmitKey : MonoBehaviour
                 newColor = noSuchWordColor;
                 break;
         }
-        keyboardKeyVisuals.PlayUpdateColor(newColor, UpdateText);
+        gameVisuals.PlayUpdateColor(newColor, UpdateText);
     }
 
     void UpdateText()
     {
         bool submitStateIsRed = submitState == SubmitState.noSuchWord;
         string newText = submitStateIsRed ? noSuchWordText : submitText;
-        keyboardKeyVisuals.UpdateText(newText);
+        gameVisuals.UpdateText(newText);
     }
 
     void ChangeColorCorrect(int pos)
@@ -95,22 +104,22 @@ public class SubmitKey : MonoBehaviour
 
     void OnMouseDown()
     {
-        if (!ButtonReady()) return;
+        if (!gameHasStarted || !ButtonReady()) return;
 
         gameManager.GuessWord();
     }
     void OnMouseEnter()
     {
-        if (!ButtonReady()) return;
+        if (!gameHasStarted ||!ButtonReady()) return;
 
-        keyboardKeyVisuals.PlayOnHoverEnter();
+        gameVisuals.PlayIncreaseScale();
     }
 
     void OnMouseExit()
     {
-        if (!ButtonReady()) return;
+        if (!gameHasStarted ||!ButtonReady()) return;
         
-        keyboardKeyVisuals.PlayOnHoverExit();
+        gameVisuals.PlayDescreaseScale();
     }
 
     bool ButtonReady()

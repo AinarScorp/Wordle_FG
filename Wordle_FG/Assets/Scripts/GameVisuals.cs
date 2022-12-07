@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
-public class KeyboardKeyVisuals : MonoBehaviour
+public class GameVisuals : MonoBehaviour
 {
     [SerializeField] TextMeshPro letterDisplay;
     [SerializeField] float pressedEffectSpeed = 3.0f;
@@ -42,43 +42,52 @@ public class KeyboardKeyVisuals : MonoBehaviour
         material = meshRenderer.material;
         meshRenderer.material = material;
     }
-    public void PlayPressEffect()
+    public void PlayPressEffect(bool reversed = false)
     {
         if (pressedEffect != null)
         {
             StopCoroutine(pressedEffect);
         }
-        pressedEffect = StartCoroutine(PressEffect());
+        pressedEffect = StartCoroutine(PressEffect(reversed));
     }
-    
-    IEnumerator PressEffect()
+
+    IEnumerator PressEffect(bool reversed = false)
     {
         Vector3 endScale = startingScale * pressedEffectEndScale;
         endScale.z = startingScale.z;
-        yield return PerformingScaleChange(startingScale, endScale, pressedEffectSpeed);
-        yield return PerformingScaleChange(endScale, startingScale, pressedEffectSpeed);
+        if (reversed)
+        {
+            yield return PerformingScaleChange(endScale, startingScale, pressedEffectSpeed);
+            yield return PerformingScaleChange(startingScale, endScale, pressedEffectSpeed);
+        }
+        else
+        {
+            yield return PerformingScaleChange(startingScale, endScale, pressedEffectSpeed);
+            yield return PerformingScaleChange(endScale, startingScale, pressedEffectSpeed);
+            
+        }
         pressedEffect = null;
     }
 
-    public void PlayOnHoverEnter()
+    public void PlayIncreaseScale()
     {
-        StopHoverCorotutines();
-        onHoverEnter = StartCoroutine(OnHoverEnter());
+        StopScaleCorotutines();
+        onHoverEnter = StartCoroutine(IncreasingScale());
     }
     
-    IEnumerator OnHoverEnter()
+    IEnumerator IncreasingScale()
     {
         Vector3 endScale = startingScale * hoverEffectEndScale;
         yield return PerformingScaleChange(startingScale, endScale, pressedEffectSpeed);
         onHoverEnter = null;
     }
-    public void PlayOnHoverExit()
+    public void PlayDescreaseScale()
     {
-        StopHoverCorotutines();
-        onHoverExit = StartCoroutine(OnHoverExit());
+        StopScaleCorotutines();
+        onHoverExit = StartCoroutine(DecreasingScale());
     }
     
-    IEnumerator OnHoverExit()
+    IEnumerator DecreasingScale()
     {
         Vector3 startScale = startingScale * hoverEffectEndScale;
         yield return PerformingScaleChange(startScale, startingScale, pressedEffectSpeed);
@@ -97,7 +106,7 @@ public class KeyboardKeyVisuals : MonoBehaviour
 
     }
 
-    public void StopHoverCorotutines()
+    public void StopScaleCorotutines()
     {
         if (onHoverEnter != null)
         {
@@ -127,7 +136,7 @@ public class KeyboardKeyVisuals : MonoBehaviour
         }
         
         
-        material.SetColor("_BaseColor", newColor);
+        UpdateColor(newColor);
         actionInBetween?.Invoke();
         
         while (percent>0)
@@ -139,11 +148,16 @@ public class KeyboardKeyVisuals : MonoBehaviour
 
         changingColor = null;
     }
-    
-    void PerformDissolveEffect(float percent)
+
+    public void UpdateColor(Color newColor)
     {
-        float maxPercent = 0.5f;
-        float minPercent = -1.5f;
+        material.SetColor("_BaseColor", newColor);
+    }
+
+    public void PerformDissolveEffect(float percent,float minPercent = -1.5f, float maxPercent = 0.5f)
+    {
+        // float maxPercent = 0.5f;
+        // float minPercent = -1.5f;
         float percentSlider = Mathf.Lerp(minPercent, maxPercent, percent);
         material.SetFloat("_Percent", percentSlider);
     }

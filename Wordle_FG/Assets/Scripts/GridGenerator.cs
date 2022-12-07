@@ -11,7 +11,6 @@ public abstract class GridGenerator<T> : MonoBehaviour where T: Component
     [SerializeField]protected T componentPrefab;
 
     [SerializeField]protected List<T> generatedComponents;
-
     
     public Vector2Int GridSize => gridSize;
     

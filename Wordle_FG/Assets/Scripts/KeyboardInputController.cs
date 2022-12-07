@@ -21,7 +21,13 @@ public class KeyboardInputController : MonoBehaviour
         }
         gameManager.GameIsOver += gameIsWon => Destroy(this);
 
+        WaitForGameStart();
         
+    }
+    void WaitForGameStart()
+    {
+        gameManager.GameHasStarted += () => this.enabled = true;
+        this.enabled = false;
     }
 
     void Update()

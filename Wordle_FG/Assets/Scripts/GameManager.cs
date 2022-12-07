@@ -15,6 +15,7 @@ public class GameManager : MonoBehaviour
     int currentRow;
     int currentLetter;
 
+    public event Action GameHasStarted; 
     public event Action<bool> GameIsOver; //isWon
     public event Action<LetterBlock, LetterState> LetterChecked;
     public event Action<int, int, Char> LetterAdded; //currentRow, currentLetter, newChar
@@ -30,7 +31,6 @@ public class GameManager : MonoBehaviour
         {
             wordDictionary = FindObjectOfType<WordDictionary>();
         }
-
         if (gridManager == null)
         {
             gridManager = FindObjectOfType<GridManager>();
@@ -38,11 +38,12 @@ public class GameManager : MonoBehaviour
     }
 
 
-    void Start()
+    public void StartTheGame(bool easyMode)
     {
+        this.easyMode = easyMode;
         GetRandomWord();
+        GameHasStarted?.Invoke();
     }
-
     public void AddLetter(Char letter)
     {
         if (currentLetter >= WordLength)
@@ -79,12 +80,18 @@ public class GameManager : MonoBehaviour
         CheckWordByLetter();
         currentRow++;
         currentLetter = 0;
+        CheckIfGameLost();
+    }
+
+    void CheckIfGameLost()
+    {
         if (currentRow == overFinalRow)
         {
             //game is lost
             GameIsOver?.Invoke(false);
         }
     }
+
     void ConcludeWinningGame()
     {
         foreach (var letterBlock in gridManager.RowOfLetters[currentRow])
@@ -139,8 +146,10 @@ public class GameManager : MonoBehaviour
             goalWord.Letters[indexOfFirstDiscoveredLetter].isDiscovered = true;
         }
 
-        LetterState letterState;
-        letterState = correctPos ? LetterState.FoundCorrectPosition : letterExists ? LetterState.LetterExistsButWrongPos : LetterState.NoSuchLetter;
+        LetterState letterState = correctPos ?
+            LetterState.FoundCorrectPosition : letterExists ?
+                LetterState.LetterExistsButWrongPos : LetterState.NoSuchLetter;
+        
         LetterChecked?.Invoke(guessingLetter, letterState);
     }
 
@@ -175,8 +184,7 @@ public class GameManager : MonoBehaviour
         goalWord = new GoalWord(randomWord);
     }
 
-    public void SetDifficulty(bool isEasy)
-    {
-        easyMode = isEasy;
-    }
+    public GoalWord GetGoalWord() => goalWord;
+
+
 }

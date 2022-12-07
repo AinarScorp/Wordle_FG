@@ -7,8 +7,10 @@ public class GridManager : MonoBehaviour
 {
     [SerializeField] LetterBlocksGenerator letterBlocksGenerator;
     [SerializeField] float spinInterval = 1.0f;
+    [SerializeField] float gameOverDelay = 2.0f;
     LetterBlock[][] rowOfLetters;
 
+    bool gameIsFinished;
     public LetterBlock[][] RowOfLetters => rowOfLetters;
     public Vector2Int GridSize => letterBlocksGenerator.GridSize;
 
@@ -26,7 +28,8 @@ public class GridManager : MonoBehaviour
     {
         GameManager gameManager = FindObjectOfType<GameManager>();
         gameManager.WordGuessed += SpinRow;
-        
+        gameManager.GameIsOver += gameIsWon => gameIsFinished = true;
+
     }
 
     void SpinRow(int rowIndex)
@@ -40,6 +43,13 @@ public class GridManager : MonoBehaviour
         {
             letterBlock.Spin();
             yield return new WaitForSeconds(spinInterval);
+        }
+
+        if (gameIsFinished)
+        {
+            //finish the game
+            yield return new WaitForSeconds(gameOverDelay);
+            FindObjectOfType<GameLoopManager>().ChangeScene(false);
         }
     }
     void PopulateRowOfLetters()

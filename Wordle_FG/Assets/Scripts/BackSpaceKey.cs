@@ -5,28 +5,46 @@ using UnityEngine;
 
 public class BackSpaceKey : MonoBehaviour
 {
-    KeyboardKeyVisuals keyboardKeyVisuals;
+    GameVisuals gameVisuals;
     GameManager gameManager;
 
+    bool gameHasStarted;
     void Awake()
+    {
+        FindAndSubscribeToGameManager();
+        gameVisuals = GetComponent<GameVisuals>();
+    }
+
+    void FindAndSubscribeToGameManager()
     {
         gameManager = GameObject.FindWithTag("GameManager").GetComponent<GameManager>();
         gameManager.GameIsOver += gameIsWon => Destroy(this);
-        gameManager.LetterRemoved += (row, pos) => keyboardKeyVisuals.PlayPressEffect();
-        keyboardKeyVisuals = GetComponent<KeyboardKeyVisuals>();
+        gameManager.LetterRemoved += (row, pos) => gameVisuals.PlayPressEffect();
+        gameManager.GameHasStarted += () => gameHasStarted = true;
     }
+
 
     void OnMouseDown()
     {
-        gameManager.RemoveLetter();
+        if (gameHasStarted)
+        {
+            gameManager.RemoveLetter();
+            
+        }
     }
     void OnMouseEnter()
     {
-        keyboardKeyVisuals.PlayOnHoverEnter();
+        if (gameHasStarted)
+        {
+            gameVisuals.PlayIncreaseScale();
+        }
     }
 
     void OnMouseExit()
     {
-        keyboardKeyVisuals.PlayOnHoverExit();
+        if (gameHasStarted)
+        {
+            gameVisuals.PlayDescreaseScale();
+        }
     }
 }

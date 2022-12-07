@@ -6,54 +6,34 @@ using UnityEngine;
 public class LetterBlock : MonoBehaviour
 {
     [SerializeField] float rotationSpeed = 5.0f;
-
     [SerializeField] TextMeshPro displayLetter;
 
-    [SerializeField] MeshRenderer meshRenderer;
-    Material material;
     char chosenLetter;
     int thisRow, letterPosition;
-    Coroutine spinningCoroutine;
-
     Color updatedColor;
-    public char ChosenLetter => chosenLetter;
 
+
+    Coroutine spinningCoroutine;
+    GameVisuals gameVisuals;
+    public char ChosenLetter => chosenLetter;
     public int LetterPosition => letterPosition;
 
     void Awake()
     {
-        AssignMaterial();
         if (displayLetter == null)
         {
             displayLetter = GetComponentInChildren<TextMeshPro>();
         }
+
+        gameVisuals = GetComponent<GameVisuals>();
     }
-
-    void AssignMaterial()
-    {
-        if (meshRenderer == null)
-        {
-            meshRenderer = GetComponentInChildren<MeshRenderer>();
-        }
-
-        if (material == null)
-        {
-            material = meshRenderer.material;
-        }
-
-        meshRenderer.material = material;
-    }
+    
 
     public void GetUpdatedColor(Color newColor)
     {
         updatedColor = newColor;
     }
-    void UpdateColor()
-    {
-        //material.color = updatedColor;
-        material.SetColor("_BaseColor", updatedColor);
 
-    }
     public void UpdateLetter(char newLetter)
     {
         chosenLetter = Char.ToUpper(newLetter);
@@ -63,27 +43,34 @@ public class LetterBlock : MonoBehaviour
     void UpdateLetterOrientation()
     {
         float dotProduct = Vector3.Dot(transform.forward, Vector3.forward);
+        float sign = Mathf.Sign(dotProduct);
+        
         Vector3 localScale = displayLetter.transform.localScale;
         float startingSign =Mathf.Sign(localScale.y);
-        float sign = Mathf.Sign(dotProduct);
         localScale.y = sign;
 
-        PerformDissolveEffect(sign, dotProduct);
         displayLetter.transform.localScale = localScale;
-
+        PerformDissolveEffect(sign, dotProduct);
+        
         //Update sign when flipped
         if ((int)startingSign !=(int)sign)
         {
-            UpdateColor();
+            gameVisuals.UpdateColor(updatedColor);
         }
     }
 
     void PerformDissolveEffect(float sign, float dotProduct)
     {
-        float maxPercent = 0.5f;
-        float minPercent = -1.5f;
-        float percentSlider = sign > 0 ? Mathf.Lerp(minPercent, maxPercent, 1 - dotProduct) : Mathf.Lerp(maxPercent, minPercent, -dotProduct);
-        material.SetFloat("_Percent", percentSlider);
+        float percent = sign > 0 ? 1 - dotProduct : -dotProduct;
+        float minPercent = sign > 0 ? -1.5f : 0.5f;
+        float maxPercent = sign > 0 ? 0.5f : -1.5f;
+
+        gameVisuals.PerformDissolveEffect(percent, minPercent, maxPercent);
+    }
+
+    public void PlayPressEffect()
+    {
+        gameVisuals.PlayPressEffect(false);
     }
 
     [ContextMenu("Spin")]
@@ -111,8 +98,6 @@ public class LetterBlock : MonoBehaviour
             yield return new WaitForEndOfFrame();
         }
         transform.rotation = endRotation;
-
-
         spinningCoroutine = null;
     }
 
